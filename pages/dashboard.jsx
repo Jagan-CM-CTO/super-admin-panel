@@ -8,6 +8,7 @@ import axios from "axios";
 import useRouter from "next/router";
 import SellerCard from "../components/SellerCard";
 import { isAuthenticated } from "@/helper/auth";
+import { API_URL } from "@/helper/api";
 
 const Sellers = () => {
   const [sellers, setSellers] = useState([]);
@@ -17,14 +18,11 @@ const Sellers = () => {
   let jwt = auth.data?.jwt;
   // console.log(jwt);
   const getSellers = async () => {
-    let res = await axios.get(
-      "https://cloudmagician.co.in/api/seller-accounts?populate=*",
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.get(`${API_URL}seller-accounts?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     setSellers(res.data.data);
     // console.log(res.data.data);
   };
