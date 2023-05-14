@@ -50,6 +50,7 @@ import SellerCard from "../components/SellerCard";
 import { isAuthenticated } from "@/helper/auth";
 import RechargeAgentCard from "@/components/RechargeAgentCard";
 import HostAgentCard from "@/components/HostAgentCard";
+import { API_URL } from "@/helper/api";
 
 const AssignAgent = () => {
   const router = useRouter();
@@ -67,18 +68,13 @@ const AssignAgent = () => {
       },
     };
     // console.log(body);
-    let res = await axios.post(
-      "https://cloudmagician.co.in/api/host-agent-accounts",
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.post(`${API_URL}host-agent-accounts`, body, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     // console.log(res);
     if (res.status !== 200) {
-
       toast({
         title: "error",
         description: `Couldn't assign agent\n ${res.error?.message}`,
@@ -146,15 +142,12 @@ const HostAgent = () => {
   let jwt = auth.data?.jwt;
   // console.log(jwt);
   const getHostAgents = async () => {
-    let res = await axios.get(
-      "https://cloudmagician.co.in/api/host-agent-accounts?populate=*",
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
-    setHostAgents(res.data.data);
+    let res = await axios.get(`${API_URL}host-agent-accounts?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    setHostAgents(res?.data?.data);
     // console.log(res.data.data);
   };
 
@@ -208,7 +201,7 @@ const HostAgent = () => {
                   hostAgent.attributes?.agent_user?.data?.id
                     ?.toString()
                     .includes(search) ||
-                  hostAgent.attributes.agent_user.data.attributes.first_name
+                  hostAgent?.attributes?.agent_user?.data?.attributes?.first_name
                     ?.toLowerCase()
                     .includes(search)
                 ) {
@@ -223,7 +216,8 @@ const HostAgent = () => {
                   <HostAgentCard
                     key={i}
                     agentName={
-                      hostAgent.attributes.agent_user.data.attributes.first_name
+                      hostAgent?.attributes?.agent_user?.data?.attributes
+                        ?.first_name
                     }
                     // displayName={HostAgent.attributes.display_name}
                     data={hostAgent}
