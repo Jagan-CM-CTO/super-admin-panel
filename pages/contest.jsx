@@ -18,6 +18,7 @@ import { BsFillPlayCircleFill, BsPerson } from "react-icons/bs";
 import { GiExtraTime } from "react-icons/gi";
 import { AiFillPauseCircle, AiOutlineFieldTime } from "react-icons/ai";
 import { CgMonday } from "react-icons/cg";
+import { API_URL } from "@/helper/api";
 
 const StatsCard = ({ title, stat, icon }) => {
   return (
@@ -61,7 +62,7 @@ const Contest = () => {
   let jwt = auth.data?.jwt;
   // console.log(jwt);
   const getCompetition = async () => {
-    let res = await axios.get("https://cloudmagician.co.in/api/competition", {
+    let res = await axios.get(`${API_URL}competition`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -80,7 +81,7 @@ const Contest = () => {
       body.paused_at = new Date();
     }
     let res = await axios.put(
-      "https://cloudmagician.co.in/api/competition",
+      `${API_URL}competition`,
       { data: body },
       {
         headers: {
