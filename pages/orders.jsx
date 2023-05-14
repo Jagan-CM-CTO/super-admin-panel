@@ -50,6 +50,7 @@ import {
 import axios from "axios";
 import { useRouter } from "next/router";
 import { isAuthenticated } from "@/helper/auth";
+import { API_URL } from "@/helper/api";
 
 const ViewOrderModal = ({ btnText, order }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -249,7 +250,7 @@ const Orders = () => {
     let reqBody = { status: status };
 
     let res = await axios.put(
-      `https://cloudmagician.co.in/api/orders/${id}`,
+      `${API_URL}orders/${id}`,
       {
         data: reqBody,
       },
@@ -278,7 +279,7 @@ const Orders = () => {
   const getOrders = async () => {
     console.log("I'm innnn");
     let res = await axios.get(
-      "https://cloudmagician.co.in/api/orders?pagination[pageSize]=100&populate=*",
+      `${API_URL}orders?pagination[pageSize]=100&populate=*`,
       {
         headers: {
           "Content-Type": "multipart/form-data",
