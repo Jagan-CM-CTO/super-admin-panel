@@ -8,6 +8,10 @@ const colors = {
   },
 };
 
+// export function reportWebVitals(metric) {
+//   console.log(metric);
+// }
+
 const theme = extendTheme({ colors });
 
 function MyApp({ Component, pageProps }) {
