@@ -47,6 +47,7 @@ import SellerCard from "../components/SellerCard";
 import { isAuthenticated } from "@/helper/auth";
 import RechargeAgentCard from "@/components/RechargeAgentCard";
 import moment from "moment";
+import { API_URL } from "@/helper/api";
 
 const AssignAgent = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -65,15 +66,11 @@ const AssignAgent = () => {
       },
     };
     // console.log(body);
-    let res = await axios.post(
-      "https://cloudmagician.co.in/api/recharge-agent-accounts",
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.post(`${API_URL}recharge-agent-accounts`, body, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     // console.log(res);
     if (res.status !== 200) {
       // console.log("HURRRRR", res);
@@ -146,14 +143,11 @@ const ViewAgentTopups = () => {
 
     try {
       axios
-        .get(
-          "https://cloudmagician.co.in/api/recharges-by-me?sort=createdAt:DESC&populate=*",
-          {
-            headers: {
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        )
+        .get(`${API_URL}recharges-by-me?sort=createdAt:DESC&populate=*`, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        })
         .then((res) => {
           console.log(res);
           setTopups(res.data);
@@ -266,14 +260,11 @@ const RechargeAgents = () => {
   let jwt = auth.data?.jwt;
   // console.log(jwt);
   const getRechargeAgents = async () => {
-    let res = await axios.get(
-      "https://cloudmagician.co.in/api/recharge-agent-accounts?populate=*",
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.get(`${API_URL}recharge-agent-accounts?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     setRechargeAgents(res.data.data);
   };
 
