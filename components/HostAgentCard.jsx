@@ -53,6 +53,7 @@ import { BiUserCircle, BiUserPin } from "react-icons/bi";
 import { GiCutDiamond } from "react-icons/gi";
 import Router from "next/router";
 import { useEffect, useState } from "react";
+import { API_URL } from "@/helper/api";
 
 const ViewUsersUnderAgent = ({ agentId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -72,7 +73,7 @@ const ViewUsersUnderAgent = ({ agentId }) => {
     try {
       axios
         .post(
-          "https://cloudmagician.co.in/api/hosts-for-admin",
+          `${API_URL}hosts-for-admin`,
           {
             agentId: agentId,
           },
@@ -84,26 +85,26 @@ const ViewUsersUnderAgent = ({ agentId }) => {
         )
         .then((res) => {
           if (res.data.length != 0) {
-            setHosts(res.data[0].hosts);
-            setDiamonds(res.data.diamonds);
+            setHosts(res.data[0]?.hosts);
+            setDiamonds(res?.data?.diamonds);
             axios
-              .get("https://cloudmagician.co.in/api/dollar-value", {
+              .get(`${API_URL}dollar-value`, {
                 headers: {
                   Authorization: `Bearer ${jwt}`,
                 },
               })
               .then((res) => {
-                setDollarRate(res.data.data.attributes.diamonds);
+                setDollarRate(res?.data?.data?.attributes?.diamonds);
               });
             axios
-              .get("https://cloudmagician.co.in/api/agent-host-salary-ratio", {
+              .get(`${API_URL}agent-host-salary-ratio`, {
                 headers: {
                   Authorization: `Bearer ${jwt}`,
                 },
               })
               .then((res) => {
-                setAgentMargin(res.data.data.attributes.agent_margin);
-                setHostMargin(res.data.data.attributes.host_salary);
+                setAgentMargin(res?.data?.data?.attributes?.agent_margin);
+                setHostMargin(res.data?.data?.attributes?.host_salary);
               });
           }
         });
@@ -114,11 +115,6 @@ const ViewUsersUnderAgent = ({ agentId }) => {
 
   useEffect(() => {
     getData();
-    // console.log(hosts);
-    // console.log(hostMargin);
-    // console.log(agentMargin);
-    // console.log(dollarRate);
-    // console.log(diamonds);
   }, []);
 
   return (
@@ -257,15 +253,12 @@ const RemoveAgentButton = ({ id }) => {
   let jwt = auth.data?.jwt;
   console.log(id);
   const handleDelete = async () => {
-    let res = await axios.delete(
-      `https://cloudmagician.co.in/api/host-agent-accounts/${id}`,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.delete(`${API_URL}host-agent-accounts/${id}`, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
 
     if (res.error) {
       toast({
@@ -366,7 +359,7 @@ const HostAgentCard = ({ agentName, data }) => {
             <span>
               <Icon mr="1" fontSize="30" color={"brand.400"} as={BiUserPin} />
             </span>
-            USER ID: {data ? data.attributes.agent_user.data.id : "null"}
+            USER ID: {data ? data?.attributes?.agent_user?.data?.id : "null"}
           </Text>
         </Stack>
       </Flex>
@@ -377,7 +370,7 @@ const HostAgentCard = ({ agentName, data }) => {
         spacing={6}
         // minWidth={"full"}
       >
-        <ViewUsersUnderAgent agentId={data.attributes.agent_user.data.id} />
+        <ViewUsersUnderAgent agentId={data?.attributes?.agent_user?.data?.id} />
         <RemoveAgentButton id={data.id} />
       </Stack>
     </Flex>
