@@ -52,6 +52,7 @@ import { useState } from "react";
 import { GiTwoCoins } from "react-icons/gi";
 import { BiUserCircle, BiUserPin } from "react-icons/bi";
 import moment from "moment";
+import { API_URL } from "@/helper/api";
 
 const RemoveAgentButton = ({ id }) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
@@ -62,15 +63,12 @@ const RemoveAgentButton = ({ id }) => {
   let jwt = auth.data?.jwt;
   // console.log(id);
   const handleDelete = async () => {
-    let res = await axios.delete(
-      `https://cloudmagician.co.in/api/recharge-agent-accounts/${id}`,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.delete(`${API_URL}recharge-agent-accounts/${id}`, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
 
     if (res.error) {
       toast({
@@ -150,15 +148,11 @@ const RechargeCoins = ({ agentId }) => {
     };
     // console.log(body);
 
-    let res = await axios.post(
-      `https://cloudmagician.co.in/api/send-coins/`,
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.post(`${API_URL}send-coins/`, body, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     // console.log(res);
     if (!res.data) {
       // console.log("cURRRRR", res);
@@ -232,14 +226,11 @@ const ViewAgentTransactions = ({ agentId }) => {
 
     try {
       axios
-        .get(
-          "https://cloudmagician.co.in/api/coin-requests?sort=createdAt:DESC&populate=*",
-          {
-            headers: {
-              Authorization: `Bearer ${jwt}`,
-            },
-          }
-        )
+        .get(`${API_URL}coin-requests?sort=createdAt:DESC&populate=*`, {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        })
         .then((res) => {
           setCoinRequests(res.data.data);
         });
