@@ -1,3 +1,4 @@
+import { API_URL } from "@/helper/api";
 import {
   Heading,
   Avatar,
@@ -156,7 +157,7 @@ const SellerInfoModal = ({ sellerInfo }) => {
                     </Heading>
 
                     <Image
-                      src={`https://cloudmagician.co.in${sellerInfo?.attributes.building_nameplate.data[0].attributes.url}`}
+                      src={`https://cloudmagician.co.in${sellerInfo?.attributes?.building_nameplate.data[0]?.attributes?.url}`}
                       alt="building_nameplate"
                       mx="auto"
                       my="4"
@@ -168,7 +169,7 @@ const SellerInfoModal = ({ sellerInfo }) => {
                     </Heading>
 
                     <Image
-                      src={`https://cloudmagician.co.in${sellerInfo?.attributes.company_nameplate.data[0].attributes.url}`}
+                      src={`https://cloudmagician.co.in${sellerInfo?.attributes?.company_nameplate.data[0]?.attributes?.url}`}
                       alt="building_nameplate"
                       mx="auto"
                       my="4"
@@ -319,7 +320,7 @@ const ViewProductModal = ({ productId }) => {
   const loadProduct = async () => {
     // console.log(productId);
     let res = await axios.get(
-      `https://cloudmagician.co.in/api/ecommerce-products/${productId}?populate=*`
+      `${API_URL}ecommerce-products/${productId}?populate=*`
     );
     let data = await res.data.data;
     // console.log(data);
