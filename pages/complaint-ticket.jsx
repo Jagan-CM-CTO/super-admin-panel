@@ -42,6 +42,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { isAuthenticated } from "@/helper/auth";
+import { API_URL } from "@/helper/api";
 
 const ViewTicketModel = ({ ticket }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -90,14 +91,11 @@ const ComplaintTicket = () => {
   const auth = isAuthenticated();
   const jwt = auth.data?.jwt;
   const getComplaintTickets = async () => {
-    let res = await axios.get(
-      "https://cloudmagician.co.in/api/complaint-tickets?populate=*",
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    );
+    let res = await axios.get(`${API_URL}complaint-tickets?populate=*`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     return res;
   };
 
