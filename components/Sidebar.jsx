@@ -135,7 +135,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
           }
         />
         <Text fontSize={"xl"} fontWeight="semibold" mt="2">
-          Hello Emiram!
+          Hello Admin!
         </Text>
       </Flex>
       {LinkItems.map((link) => (
@@ -257,10 +257,10 @@ const MobileNav = ({ onOpen, ...rest }) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">Emiram</Text>
-                  <Text fontSize="xs" color="gray.600">
+                  <Text fontSize="sm">Admin</Text>
+                  {/* <Text fontSize="xs" color="gray.600">
                     Super Admin
-                  </Text>
+                  </Text> */}
                 </VStack>
                 <Box display={{ base: "none", md: "flex" }}>
                   <FiChevronDown />
