@@ -54,7 +54,7 @@ import { BiUserCircle, BiUserPin } from "react-icons/bi";
 import moment from "moment";
 import { API_URL } from "@/helper/api";
 
-const RemoveAgentButton = ({ id }) => {
+const RemoveAgentButton = ({ id, getRechargeAgents }) => {
   const { isOpen, onToggle, onClose } = useDisclosure();
   const toast = useToast();
   // const router = Router();
@@ -87,7 +87,7 @@ const RemoveAgentButton = ({ id }) => {
         isClosable: true,
       });
       onClose();
-      Router.reload();
+      getRechargeAgents();
     }
     return res;
   };
@@ -367,7 +367,11 @@ const ViewAgentTransactions = ({ agentId }) => {
   );
 };
 
-const RechargeAgentCard = ({ agentName = "No name", data }) => {
+const RechargeAgentCard = ({
+  agentName = "No name",
+  data,
+  getRechargeAgents,
+}) => {
   console.log(data);
   return (
     <Flex
@@ -450,7 +454,7 @@ const RechargeAgentCard = ({ agentName = "No name", data }) => {
           View Agent Transactions
         </Button> */}
         <ViewAgentTransactions agentId={data.id} />
-        <RemoveAgentButton id={data.id} />
+        <RemoveAgentButton id={data.id} getRechargeAgents={getRechargeAgents} />
       </Stack>
     </Flex>
   );
