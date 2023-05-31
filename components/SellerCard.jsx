@@ -1,4 +1,5 @@
 import { API_URL } from "@/helper/api";
+import { isAuthenticated } from "@/helper/auth";
 import {
   Heading,
   Avatar,
@@ -34,9 +35,12 @@ import {
   CardBody,
   CardFooter,
   StackDivider,
+  Input,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MdEdit } from "react-icons/md";
 
 const SellerInfoModal = ({ sellerInfo }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -157,7 +161,10 @@ const SellerInfoModal = ({ sellerInfo }) => {
                     </Heading>
 
                     <Image
-                      src={`https://cloudmagician.co.in${sellerInfo?.attributes?.building_nameplate.data[0]?.attributes?.url}`}
+                      src={
+                        sellerInfo?.attributes?.building_nameplate.data[0]
+                          ?.attributes?.url
+                      }
                       alt="building_nameplate"
                       mx="auto"
                       my="4"
@@ -169,7 +176,11 @@ const SellerInfoModal = ({ sellerInfo }) => {
                     </Heading>
 
                     <Image
-                      src={`https://cloudmagician.co.in${sellerInfo?.attributes?.company_nameplate.data[0]?.attributes?.url}`}
+                      src={
+                        sellerInfo?.attributes?.company_nameplate.data[0]
+                          ?.attributes?.url
+                      }
+                      fallbackSrc=""
                       alt="building_nameplate"
                       mx="auto"
                       my="4"
@@ -190,8 +201,114 @@ const SellerInfoModal = ({ sellerInfo }) => {
     </>
   );
 };
-const ViewProductsModal = ({ products }) => {
+
+const UpdateSellingPrice = ({ getProducts, productID }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [sellingPrice, setSellingPrice] = useState(null);
+  const toast = useToast();
+  let auth = isAuthenticated();
+  let jwt = auth?.data?.jwt;
+
+  const updateProduct = async () => {
+    let res = await axios.put(
+      `${API_URL}ecommerce-products/${productID}`,
+      {
+        data: { selling_price: sellingPrice },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
+    );
+
+    return res;
+  };
+
+  const onSubmit = (event) => {
+    event.preventDefault();
+
+    updateProduct().then((data) => {
+      if (data.error) {
+        toast({
+          title: "Error",
+          description: "Updation Failed",
+          status: "danger",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        setSellingPrice(null);
+
+        toast({
+          title: "Success",
+          description: "Selling Price updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        onClose();
+        getProducts();
+      }
+    });
+  };
+
+  const handleChange = (e) => {
+    setSellingPrice(e.target.value);
+  };
+
+  return (
+    <>
+      <Button onClick={onOpen} color="brand.400" bg="transparent">
+        <MdEdit />
+      </Button>
+
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Update Selling Price</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody py={5}>
+            <Flex>
+              <Input
+                placeholder=""
+                type="number"
+                mr={4}
+                value={sellingPrice}
+                onChange={handleChange}
+              />
+              <Button color="white" bg="brand.400" onClick={onSubmit}>
+                Update
+              </Button>
+            </Flex>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
+const ViewProductsModal = ({ sellerID }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [products, setProducts] = useState([]);
+
+  const getProducts = async () => {
+    if (typeof window !== "undefined") {
+      let auth = isAuthenticated();
+      let jwt = auth.data?.jwt;
+      let res = await axios.get(`${API_URL}seller-products/${sellerID}`, {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      });
+      setProducts(res.data?.ecommerce_products);
+      console.log("hellaaaaaaa", res.data?.ecommerce_products);
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <>
@@ -227,9 +344,10 @@ const ViewProductsModal = ({ products }) => {
                     <Thead>
                       <Tr>
                         <Th>Product Name</Th>
+                        <Th>Category</Th>
                         <Th>Sub-Category</Th>
                         <Th>Selling Price</Th>
-                        <Th>Retail Price</Th>
+                        <Th>{"Seller's Price"}</Th>
                         <Th>Availability</Th>
 
                         <Th>Actions</Th>
@@ -249,17 +367,23 @@ const ViewProductsModal = ({ products }) => {
                                   fallbackSrc="https://via.placeholder.com/70"
                                   mr="2"
                                 /> */}
-                                <Text>{product.attributes.product_name}</Text>
+                                <Text>{product.product_name}</Text>
                               </Flex>
                             </Td>
-                            <Td>
-                              {
-                                product.attributes.ecommerce_subcategory?.data
-                                  ?.attributes?.title
-                              }
+                            <Td>{product?.ecommerce_subcategory?.title}</Td>
+                            <Td>{product?.ecommerce_category?.title}</Td>
+                            <Td
+                              display={"flex"}
+                              justifyContent={"space-between"}
+                              alignItems={"center"}
+                            >
+                              ${product.selling_price}
+                              <UpdateSellingPrice
+                                productID={product?.id}
+                                getProducts={getProducts}
+                              />
                             </Td>
-                            <Td>${product.attributes.selling_price}</Td>
-                            <Td>${product.attributes.retail_price}</Td>
+                            <Td textAlign="center">${product.seller_price}</Td>
                             <Td>
                               <Badge colorScheme="green" textTransform={"none"}>
                                 In-Stock
@@ -299,59 +423,25 @@ const ViewProductsModal = ({ products }) => {
 };
 
 const ViewProductModal = ({ productId }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [values, setvalues] = useState({
-    product_name: "",
-    short_description: "",
-    long_description: "",
-    selling_price: "",
-    retail_price: "",
-    // ecommerce_category: "",
-    ecommerce_subcategory: "",
-    product_image: "",
-    // loading: false,
-    // error: "",
-    // createdProduct: "",
-    // getRedicrect: false,
-    // formData: "",
-  });
+  const [isOpen, setIsOpen] = useState(false);
+  const [product, setProduct] = useState(null);
 
   const loadProduct = async () => {
-    // console.log(productId);
-    let res = await axios.get(
-      `${API_URL}ecommerce-products/${productId}?populate=*`
-    );
-    let data = await res.data.data;
-    // console.log(data);
-    // console.log(data.attributes.selling_price);
-    // console.log(data.attributes.retail_price);
+    try {
+      const response = await axios.get(
+        `${API_URL}ecommerce-products/${productId}?populate=*`
+      );
+      const data = response.data.data;
 
-    setvalues({
-      ...values,
-      product_name: data.attributes.product_name
-        ? data.attributes.product_name
-        : "",
-      short_description: data.attributes.short_description
-        ? data.attributes.short_description
-        : "",
-      long_description: data.attributes.long_description
-        ? data.attributes.long_description
-        : "",
-      selling_price: data.attributes.selling_price
-        ? data.attributes.selling_price
-        : "",
-      retail_price: data.attributes.retail_price
-        ? data.attributes.retail_price
-        : "",
-      ecommerce_category:
-        data.attributes?.ecommerce_category?.data?.attributes?.title,
-      ecommerce_subcategory:
-        data.attributes?.ecommerce_subcategory?.data?.attributes?.title,
-      // product_image: data.attributes?.ecommerce_category?.data?.attributes?.title,
-    });
-    // console.log(values);
-    onOpen();
+      setProduct(data);
+      setIsOpen(true);
+    } catch (error) {
+      console.error("Error loading product:", error);
+    }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -364,46 +454,73 @@ const ViewProductModal = ({ productId }) => {
       >
         View
       </Button>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={handleClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Product Details</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text fontSize={"sm"} as={"b"}>
-              Product Name
-            </Text>
-            <Text mb={6}>{values.product_name}</Text>
-            <Divider />
-            <Text fontSize={"sm"} as={"b"} mt={8}>
-              Short Description
-            </Text>
-            <Text mb={2}>{values.short_description}</Text>
-            <Divider />
-            <Text fontSize={"sm"} as={"b"} mt={8}>
-              Long Description
-            </Text>
-            <Text mb={2}>{values.long_description}</Text>
-            <Divider />
-            <Text fontSize={"sm"} as={"b"} mt={8}>
-              Retail Price
-            </Text>
-            <Text mb={2}>{values.retail_price} QAR</Text>
-            <Divider />
-            <Text fontSize={"sm"} as={"b"} mt={8}>
-              Selling Price
-            </Text>
-            <Text mb={2}>{values.selling_price} QAR</Text>
-            <Divider />
-            <Text fontSize={"sm"} as={"b"} mt={8}>
-              Sub-category
-            </Text>
-            <Text mb={2}>{values.ecommerce_subcategory}</Text>
-            <Divider />
+            {product ? (
+              <Stack spacing={4}>
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    Product Name
+                  </Text>
+                  <Text>{product.attributes.product_name}</Text>
+                </Box>
+                <Divider />
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    Short Description
+                  </Text>
+                  <Text>{product.attributes.short_description}</Text>
+                </Box>
+                <Divider />
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    Long Description
+                  </Text>
+                  <Text>{product.attributes.long_description}</Text>
+                </Box>
+                <Divider />
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    {"Seller's Price"}
+                  </Text>
+                  <Text>{product.attributes.seller_price}</Text>
+                </Box>
+                <Divider />
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    Selling Price
+                  </Text>
+                  <Text>{product.attributes.selling_price}</Text>
+                </Box>
+                <Divider />
+                <Box>
+                  <Text fontSize="sm" fontWeight="bold">
+                    Sub-category
+                  </Text>
+                  <Text>
+                    {
+                      product.attributes.ecommerce_subcategory?.data?.attributes
+                        ?.title
+                    }
+                  </Text>
+                </Box>
+                <Divider />
+              </Stack>
+            ) : (
+              <Text>Loading product...</Text>
+            )}
           </ModalBody>
-
           <ModalFooter>
-            <Button colorScheme="blue" bg="brand.400" mr={3} onClick={onClose}>
+            <Button
+              colorScheme="blue"
+              bg="brand.400"
+              mr={3}
+              onClick={handleClose}
+            >
               Close
             </Button>
           </ModalFooter>
@@ -413,7 +530,7 @@ const ViewProductModal = ({ productId }) => {
   );
 };
 
-const SellerCard = ({ sellerName, displayName, data }) => {
+const SellerCard = ({ sellerName, displayName, seller, profits, sellerID }) => {
   return (
     <Center py={6}>
       <Box
@@ -452,7 +569,7 @@ const SellerCard = ({ sellerName, displayName, data }) => {
         <Box p={6}>
           <Stack spacing={0} align={"center"} mb={5}>
             <Heading fontSize={"2xl"} fontWeight={500} fontFamily={"body"}>
-              {sellerName ? sellerName : "Emiram"}
+              {sellerName ? sellerName : "No name"}
             </Heading>
             <Text color={"gray.500"}>
               {displayName ? displayName : "iTech Solutions"}
@@ -461,33 +578,42 @@ const SellerCard = ({ sellerName, displayName, data }) => {
 
           <Stack
             direction={"row"}
-            justify={"space-around"}
-            spacing={6}
+            justify={"space-evenly"}
+            wrap="wrap"
+            spacing={5}
             minWidth={"full"}
           >
             {/* <Stack spacing={0} align={"center"}>
-              <Text fontWeight={600}>23</Text>
+              <Text fontWeight={600}>{23}</Text>
               <Text fontSize={"sm"} color={"gray.500"}>
-                Products listed
-              </Text>
-            </Stack>
-            <Stack spacing={0} align={"center"}>
-              <Text fontWeight={600}>394</Text>
-              <Text fontSize={"sm"} color={"gray.500"}>
-                Sold Units
-              </Text>
-            </Stack>
-            <Stack spacing={0} align={"center"}>
-              <Text fontWeight={600}>$56k</Text>
-              <Text fontSize={"sm"} color={"gray.500"}>
-                Net Revenue
+                {"Seller's Total Revenue"}
               </Text>
             </Stack> */}
+            <Stack spacing={0} align={"center"}>
+              <Text fontWeight={600} color="green.500">
+                {" "}
+                ${profits[sellerID].seller_price_sum}
+              </Text>
+              <Text fontSize={"sm"} color={"gray.500"}>
+                Seller Balance
+              </Text>
+            </Stack>
+            <Stack spacing={0} align={"center"}>
+              <Text fontWeight={600} color="green.500">
+                $
+                {profits[sellerID].selling_price_sum -
+                  profits[sellerID].seller_price_sum}
+              </Text>
+              <Text fontSize={"sm"} color={"gray.500"}>
+                Our Balance
+              </Text>
+            </Stack>
           </Stack>
 
-          <SellerInfoModal sellerInfo={data} />
+          <SellerInfoModal sellerInfo={seller} />
           <ViewProductsModal
-            products={data?.attributes.ecommerce_products.data}
+            products={seller?.attributes.ecommerce_products.data}
+            sellerID={seller.id}
           />
         </Box>
       </Box>
