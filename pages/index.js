@@ -49,7 +49,10 @@ function Home() {
           }
         });
       })
-      .catch((err) => setError("Invalid email or password"));
+      .catch((err) => {
+        console.log(err);
+        setError("Invalid email or password");
+      });
   };
 
   return (
