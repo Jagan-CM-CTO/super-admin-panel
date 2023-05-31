@@ -73,11 +73,13 @@ const Sellers = () => {
             {sellers.map((seller, i) => (
               <SellerCard
                 key={i}
-                sellerName={seller.attributes.seller.data.attributes.first_name}
-                displayName={seller.attributes.display_name}
+                sellerName={
+                  seller?.attributes?.seller?.data?.attributes?.first_name
+                }
+                displayName={seller?.attributes?.display_name}
                 seller={seller}
                 profits={profits}
-                sellerID={seller.id}
+                sellerID={seller?.id}
               />
             ))}
           </Flex>
