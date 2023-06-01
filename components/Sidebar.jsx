@@ -131,8 +131,13 @@ const SidebarContent = ({ onClose, ...rest }) => {
         <Avatar
           size={"xl"}
           src={
-            "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1148&q=80"
+            "https://avatarairlines.com/wp-content/uploads/2020/05/Male-placeholder-1.jpeg"
           }
+          alt={"Author"}
+          shadow={"xl"}
+          css={{
+            border: "2px solid white",
+          }}
         />
         <Text fontSize={"xl"} fontWeight="semibold" mt="2">
           Hello Admin!
@@ -248,8 +253,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
                 <Avatar
                   size={"sm"}
                   src={
-                    "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1148&q=80"
+                    "https://avatarairlines.com/wp-content/uploads/2020/05/Male-placeholder-1.jpeg"
                   }
+                  alt="any"
                 />
                 <VStack
                   display={{ base: "none", md: "flex" }}
