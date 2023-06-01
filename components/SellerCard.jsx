@@ -41,6 +41,7 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
+import ImageSlider from "./ImageSlider";
 
 const SellerInfoModal = ({ sellerInfo }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -343,6 +344,7 @@ const ViewProductsModal = ({ sellerID }) => {
                   <Table variant="simple">
                     <Thead>
                       <Tr>
+                        <Th>Product</Th>
                         <Th>Product Name</Th>
                         <Th>Category</Th>
                         <Th>Sub-Category</Th>
@@ -358,15 +360,21 @@ const ViewProductsModal = ({ sellerID }) => {
                         return (
                           <Tr key={i}>
                             <Td>
+                              <Image
+                                boxSize="70px"
+                                objectFit="cover"
+                                src={
+                                  product?.product_image
+                                    ? product?.product_image[0].url
+                                    : ""
+                                }
+                                alt="product_img"
+                                fallbackSrc="https://via.placeholder.com/70"
+                                mr="2"
+                              />
+                            </Td>
+                            <Td>
                               <Flex align="center">
-                                {/* <Image
-                                  boxSize="70px"
-                                  objectFit="cover"
-                                  src={`https://cloudmagician.co.in${product.attributes.product_image?.data?.attributes?.url}`}
-                                  alt="product_img"
-                                  fallbackSrc="https://via.placeholder.com/70"
-                                  mr="2"
-                                /> */}
                                 <Text>{product.product_name}</Text>
                               </Flex>
                             </Td>
@@ -432,6 +440,7 @@ const ViewProductModal = ({ productId }) => {
         `${API_URL}ecommerce-products/${productId}?populate=*`
       );
       const data = response.data.data;
+      console.log(data);
 
       setProduct(data);
       setIsOpen(true);
@@ -454,7 +463,7 @@ const ViewProductModal = ({ productId }) => {
       >
         View
       </Button>
-      <Modal isOpen={isOpen} onClose={handleClose}>
+      <Modal isOpen={isOpen} onClose={handleClose} size="lg">
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Product Details</ModalHeader>
@@ -462,6 +471,13 @@ const ViewProductModal = ({ productId }) => {
           <ModalBody>
             {product ? (
               <Stack spacing={4}>
+                <ImageSlider
+                  images={
+                    product?.attributes?.product_image?.data
+                      ? product?.attributes?.product_image.data
+                      : ""
+                  }
+                />
                 <Box>
                   <Text fontSize="sm" fontWeight="bold">
                     Product Name
@@ -592,7 +608,7 @@ const SellerCard = ({ sellerName, displayName, seller, profits, sellerID }) => {
             <Stack spacing={0} align={"center"}>
               <Text fontWeight={600} color="green.500">
                 {" "}
-                ${profits[sellerID].seller_price_sum}
+                ${profits[sellerID]?.seller_price_sum}
               </Text>
               <Text fontSize={"sm"} color={"gray.500"}>
                 Seller Balance
@@ -601,8 +617,8 @@ const SellerCard = ({ sellerName, displayName, seller, profits, sellerID }) => {
             <Stack spacing={0} align={"center"}>
               <Text fontWeight={600} color="green.500">
                 $
-                {profits[sellerID].selling_price_sum -
-                  profits[sellerID].seller_price_sum}
+                {profits[sellerID]?.selling_price_sum -
+                  profits[sellerID]?.seller_price_sum}
               </Text>
               <Text fontSize={"sm"} color={"gray.500"}>
                 Our Balance
@@ -612,8 +628,8 @@ const SellerCard = ({ sellerName, displayName, seller, profits, sellerID }) => {
 
           <SellerInfoModal sellerInfo={seller} />
           <ViewProductsModal
-            products={seller?.attributes.ecommerce_products.data}
-            sellerID={seller.id}
+            products={seller?.attributes?.ecommerce_products?.data}
+            sellerID={seller?.id}
           />
         </Box>
       </Box>
