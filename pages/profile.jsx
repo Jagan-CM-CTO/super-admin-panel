@@ -56,17 +56,13 @@ const ProfileCard = () => {
           h={"120px"}
           w={"full"}
           alt="profile_pic"
-          src={
-            "https://images.unsplash.com/photo-1612865547334-09cb8cb455da?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
-          }
+          src={""}
           objectFit={"cover"}
         />
         <Flex justify={"center"} mt={-12}>
           <Avatar
             size={"xl"}
-            src={
-              "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1148&q=80"
-            }
+            src={""}
             alt={"Author"}
             shadow={"xl"}
             css={{
